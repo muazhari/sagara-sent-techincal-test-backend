@@ -5,12 +5,12 @@ import type {AuthenticatedRequest} from '../middleware/auth';
 import {auth} from '../middleware/auth';
 
 const router = Router();
-const svc = () => Container.get(RoomService);
+const roomService = () => Container.get(RoomService);
 
 router.post('/', auth(true), async (req, res) => {
     try {
         const {name} = req.body;
-        const room = await svc().create(name);
+        const room = await roomService().create(name);
         res.json(room);
     } catch (e: unknown) {
         const message = e instanceof Error ? e.message : 'Unknown error';
@@ -19,12 +19,12 @@ router.post('/', auth(true), async (req, res) => {
 });
 
 router.get('/', async (_req, res) => {
-    res.json(await svc().all());
+    res.json(await roomService().all());
 });
 
 router.get('/:id', async (req, res) => {
     try {
-        res.json(await svc().get(req.params.id));
+        res.json(await roomService().get(req.params.id));
     } catch (e: unknown) {
         const message = e instanceof Error ? e.message : 'Unknown error';
         res.status(404).json({error: message});
@@ -43,7 +43,7 @@ router.post('/:id/join', auth(true), async (req: AuthenticatedRequest, res) => {
             return res.status(401).json({error: 'User authentication required'});
         }
 
-        await svc().join(roomId, userId);
+        await roomService().join(roomId, userId);
         res.json({ok: true});
     } catch (e: unknown) {
         const error = e as Error;

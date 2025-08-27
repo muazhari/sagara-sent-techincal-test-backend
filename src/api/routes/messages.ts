@@ -6,7 +6,7 @@ import {auth} from '../middleware/auth';
 import {getIo} from '../../infrastructure/io';
 
 const router = Router();
-const svc = () => Container.get(MessageService);
+const messageService = () => Container.get(MessageService);
 
 // parent mounted at /api/rooms
 router.get('/:id/messages', async (req, res) => {
@@ -14,7 +14,7 @@ router.get('/:id/messages', async (req, res) => {
     if (!roomId) {
         return res.status(400).json({error: 'Room ID is required'});
     }
-    const list = await svc().list(roomId);
+    const list = await messageService().list(roomId);
     res.json(list);
 });
 
@@ -31,7 +31,7 @@ router.post('/:id/messages', auth(true), async (req: AuthenticatedRequest, res) 
         }
 
         const {content} = req.body;
-        const message = await svc().create(roomId, userId, content);
+        const message = await messageService().create(roomId, userId, content);
         try {
             getIo().to(roomId).emit('chatMessage', message);
         } catch (error) {

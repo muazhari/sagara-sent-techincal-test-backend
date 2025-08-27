@@ -3,12 +3,12 @@ import {Container} from 'typedi';
 import {AuthService} from '../../services/authService';
 
 const router = Router();
-const svc = () => Container.get(AuthService);
+const authService = () => Container.get(AuthService);
 
 router.post('/register', async (req, res) => {
     try {
         const {email, password} = req.body;
-        const result = await svc().register(email, password);
+        const result = await authService().register(email, password);
         res.json(result);
     } catch (e: unknown) {
         const message = e instanceof Error ? e.message : 'Unknown error';
@@ -19,7 +19,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const {email, password} = req.body;
-        const result = await svc().login(email, password);
+        const result = await authService().login(email, password);
         res.json(result);
     } catch (e: unknown) {
         const message = e instanceof Error ? e.message : 'Unknown error';

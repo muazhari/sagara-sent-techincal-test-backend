@@ -1,16 +1,14 @@
-import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, test} from 'bun:test';
+import {afterEach, beforeAll, beforeEach, describe, expect, test} from 'bun:test';
 import supertest from 'supertest';
 import {io as ioClient, Socket} from 'socket.io-client';
 import {
-    clearDatabase,
     createTestMessage,
     createTestRoom,
     createTestUser,
     getApp,
     getServerPort,
     joinTestRoom,
-    setupTest,
-    teardownTest
+    setupTest
 } from './testUtils';
 
 describe('Chat API Integration Tests', () => {
@@ -24,14 +22,7 @@ describe('Chat API Integration Tests', () => {
         app = getApp();
     });
 
-    afterAll(async () => {
-        await teardownTest();
-    });
-
     beforeEach(async () => {
-        // Clear database before each test
-        await clearDatabase();
-
         // Create test users and room for each test with unique identifiers
         user1 = await createTestUser();
         user2 = await createTestUser();
@@ -379,15 +370,19 @@ describe('Chat API Integration Tests', () => {
             const unauthedClient = ioClient(`http://localhost:${port}`);
 
             unauthedClient.on('connect', () => {
-                unauthedClient.emit('chatMessage', {
-                    roomId: room1._id,
-                    content: 'This should fail'
-                }, (response: any) => {
-                    expect(response.ok).toBe(false);
-                    expect(response.error).toBe('unauthenticated');
-                    unauthedClient.disconnect();
-                    done();
-                });
+                unauthedClient.emit(
+                    'chatMessage',
+                    {
+                        roomId: room1._id,
+                        content: 'This should fail'
+                    },
+                    (response: any) => {
+                        expect(response.ok).toBe(false);
+                        expect(response.error).toBe('unauthenticated');
+                        unauthedClient.disconnect();
+                        done();
+                    }
+                );
             });
         });
     });

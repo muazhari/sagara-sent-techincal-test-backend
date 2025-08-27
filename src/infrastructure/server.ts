@@ -12,6 +12,8 @@ import messagesRouter from '../api/routes/messages';
 import usersRouter from '../api/routes/users';
 import {setIo} from './io';
 import {Message} from "../models/message.ts";
+import {Container} from "typedi";
+import {UserService} from "../services/userService.ts";
 
 export interface BuiltServer {
     app: express.Express;
@@ -24,7 +26,7 @@ interface AuthenticatedSocket extends Socket {
     userId?: string;
 }
 
-const presence = new Set<string>();
+const userService = () => Container.get(UserService);
 
 export async function buildServer(mongoUri: string): Promise<BuiltServer> {
     if (mongoose.connection.readyState === 0) {
@@ -54,10 +56,14 @@ export async function buildServer(mongoUri: string): Promise<BuiltServer> {
         next();
     });
 
-    io.on('connection', (socket: AuthenticatedSocket) => {
+    io.on('connection', async (socket: AuthenticatedSocket) => {
         const userId = socket.userId;
         if (userId) {
-            presence.add(userId);
+            try {
+                await userService().setIsOnline(userId, true)
+            } catch (e) {
+                console.error('Failed to set user online status:', e);
+            }
             socket.broadcast.emit('userOnline', {userId});
         }
         socket.on('joinRoom', (roomId: string, ack?: Function) => {
@@ -92,8 +98,15 @@ export async function buildServer(mongoUri: string): Promise<BuiltServer> {
             if (userId) io.to(data.roomId).emit('typing', {userId, roomId: data.roomId});
             ack && ack({ok: true});
         });
-        socket.on('disconnect', () => {
-            if (userId && presence.delete(userId)) socket.broadcast.emit('userOffline', {userId});
+        socket.on('disconnect', async () => {
+            if (userId) {
+                try {
+                    await userService().setIsOnline(userId, false)
+                } catch (e) {
+                    console.error('Failed to set user offline status:', e);
+                }
+                socket.broadcast.emit('userOffline', {userId})
+            }
         });
     });
 

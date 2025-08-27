@@ -5,7 +5,7 @@ import {Container} from 'typedi';
 import {UserService} from '../../services/userService';
 
 const router = Router();
-const svc = () => Container.get(UserService);
+const userService = () => Container.get(UserService);
 
 router.get('/me', auth(true), async (req: AuthenticatedRequest, res) => {
     try {
@@ -15,7 +15,7 @@ router.get('/me', auth(true), async (req: AuthenticatedRequest, res) => {
             return res.status(401).json({error: 'User authentication required'});
         }
 
-        res.json(await svc().me(userId));
+        res.json(await userService().me(userId));
     } catch (e: unknown) {
         const error = e as Error;
         res.status(404).json({error: error.message});
