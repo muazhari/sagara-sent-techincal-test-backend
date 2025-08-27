@@ -1,0 +1,11 @@
+import {Service} from 'typedi';
+import {User} from '../models/user';
+
+@Service()
+export class UserService {
+    async me(id: string) {
+        const user = await User.findById(id);
+        if (!user) throw new Error('not found');
+        return {_id: user._id.toString(), email: user.email};
+    }
+}

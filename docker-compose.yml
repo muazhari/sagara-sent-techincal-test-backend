@@ -1,0 +1,21 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${APP_PORT}:3000"
+    entrypoint: "bun"
+    command:
+      - "run"
+      - "start"
+    healthcheck:
+      test: "netstat -ltn | grep -c 3000"
+  datastore-1:
+    image: mongo:latest
+    ports:
+      - "${DATASTORE_1_PORT}:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DATASTORE_1_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${DATASTORE_1_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${DATASTORE_1_DATABASE}
