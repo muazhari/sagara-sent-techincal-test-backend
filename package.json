@@ -1,5 +1,5 @@
 {
-  "name": "sagara-sent-techincal-test-backend",
+  "name": "sagara-sent-technical-test-backend",
   "module": "index.ts",
   "type": "module",
   "private": true,
@@ -32,8 +32,8 @@
     "body-parser": "^2.2.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.18.0",
-    "mongodb-memory-server": "^10.1.4",
+    "mongodb-memory-server": "^9.1.0",
+    "mongoose": "^7.6.0",
     "reflect-metadata": "^0.2.2",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",

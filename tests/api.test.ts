@@ -31,7 +31,7 @@ describe('Chat API Integration Tests', () => {
         await createTestMessage(room1._id, 'Initial message', user1.token);
     });
 
-    describe('Auth API', () => {
+    describe('Auth REST', () => {
         test('POST /api/auth/register - should register a new user', async () => {
             const response = await supertest(app)
                 .post('/api/auth/register')
@@ -74,7 +74,7 @@ describe('Chat API Integration Tests', () => {
         });
     });
 
-    describe('Rooms API', () => {
+    describe('Rooms REST', () => {
         test('POST /api/rooms - should create a chat room', async () => {
             const response = await supertest(app)
                 .post('/api/rooms')
@@ -147,7 +147,7 @@ describe('Chat API Integration Tests', () => {
         });
     });
 
-    describe('Messages API', () => {
+    describe('Messages REST', () => {
         test('GET /api/rooms/:id/messages - should get messages in a room', async () => {
             const response = await supertest(app).get(`/api/rooms/${room1._id}/messages`);
 
@@ -223,7 +223,7 @@ describe('Chat API Integration Tests', () => {
         });
     });
 
-    describe('Users API', () => {
+    describe('Users REST', () => {
         test('GET /api/users/me - should get current user profile', async () => {
             const response = await supertest(app)
                 .get('/api/users/me')
