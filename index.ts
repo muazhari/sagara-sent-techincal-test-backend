@@ -1,11 +1,8 @@
-import {buildServer} from './src/infrastructure/server';
-import {PORT} from './src/config/env';
+import 'reflect-metadata';
+import {APP_PORT, MONGO_URI} from "./src/infrastructure/env.ts";
+import {buildServer, type ServerInstance} from "./src/infrastructure/server.ts";
+import {setServerInstance} from "./src/infrastructure/container.ts";
 
-(async () => {
-    const mongoUri = process.env.DATASTORE_1_URI;
-    if (!mongoUri) {
-        throw new Error('DATASTORE_1_URI environment variable is not set');
-    }
-    const {httpServer} = await buildServer(mongoUri);
-    httpServer.listen(PORT, () => console.log(`Server listening on ${PORT}`));
-})();
+const serverInstance: ServerInstance = await buildServer(MONGO_URI)
+setServerInstance(serverInstance)
+serverInstance.httpServer.listen(APP_PORT, () => console.log(`Server listening on ${APP_PORT}`));

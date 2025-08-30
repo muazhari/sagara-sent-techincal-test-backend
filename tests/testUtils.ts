@@ -1,35 +1,32 @@
 import {MongoMemoryServer} from 'mongodb-memory-server';
-import {buildServer, type BuiltServer} from '../src/infrastructure/server';
+import {buildServer, type ServerInstance} from '../src/infrastructure/server';
 import supertest from 'supertest';
 import mongoose from 'mongoose';
 import {randomUUID} from "node:crypto";
+import {serverInstance, setServerInstance} from "../src/infrastructure/container.ts";
 
-let mongod: MongoMemoryServer;
-let server: BuiltServer;
-let serverPort: number;
+export let serverPort: number;
 
 export async function setupTest() {
-    mongod = await MongoMemoryServer.create();
-    const uri = mongod.getUri();
-    server = await buildServer(uri);
+    const mongoServer = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
+    const serverInstance: ServerInstance = await buildServer(uri);
+    setServerInstance(serverInstance)
 
     // Start the HTTP server on a dynamic port
     await new Promise<void>((resolve) => {
-        const httpServer = server.httpServer.listen(0, () => {
+        const httpServer = serverInstance.httpServer.listen(0, () => {
             serverPort = (httpServer.address() as any).port;
             resolve();
         });
     });
 
-    return server;
+    return serverInstance;
 }
 
 export async function teardownTest() {
-    if (server) {
-        await server.close();
-    }
-    if (mongod) {
-        await mongod.stop();
+    if (serverInstance) {
+        await serverInstance.close();
     }
 }
 
@@ -43,25 +40,10 @@ export async function clearDatabase() {
     }
 }
 
-export function getApp() {
-    return server.app;
-}
-
-export function getIo() {
-    return server.io;
-}
-
-export function getServerPort() {
-    return serverPort;
-}
-
-export async function createTestUser(email?: string, password = 'password123') {
-    // Generate unique email if not provided
-    const userEmail = email || `user${randomUUID()}@test.com`;
-
-    const response = await supertest(server.app)
+export async function createTestUser(email = `user${randomUUID()}@test.com`, password = 'password123') {
+    const response = await supertest(serverInstance.app)
         .post('/api/auth/register')
-        .send({email: userEmail, password});
+        .send({email: email, password});
 
     if (response.status !== 200) {
         console.error('Failed to create user:', response.body);
@@ -72,7 +54,7 @@ export async function createTestUser(email?: string, password = 'password123') {
 }
 
 export async function loginTestUser(email = 'test@example.com', password = 'password123') {
-    const response = await supertest(server.app)
+    const response = await supertest(serverInstance.app)
         .post('/api/auth/login')
         .send({email, password});
 
@@ -84,11 +66,8 @@ export async function loginTestUser(email = 'test@example.com', password = 'pass
     return response.body;
 }
 
-export async function createTestRoom(name?: string, token?: string) {
-    // Generate unique room name if not provided
-    const roomName = name || `room${randomUUID()}`;
-
-    const request = supertest(server.app).post('/api/rooms').send({name: roomName});
+export async function createTestRoom(name = `room${randomUUID()}`, token?: string) {
+    const request = supertest(serverInstance.app).post('/api/rooms').send({name: name});
     if (token) {
         request.set('Authorization', `Bearer ${token}`);
     }
@@ -102,7 +81,7 @@ export async function createTestRoom(name?: string, token?: string) {
 }
 
 export async function joinTestRoom(roomId: string, token: string) {
-    const response = await supertest(server.app)
+    const response = await supertest(serverInstance.app)
         .post(`/api/rooms/${roomId}/join`)
         .set('Authorization', `Bearer ${token}`)
         .send();
@@ -116,7 +95,7 @@ export async function joinTestRoom(roomId: string, token: string) {
 }
 
 export async function createTestMessage(roomId: string, content: string, token: string) {
-    const response = await supertest(server.app)
+    const response = await supertest(serverInstance.app)
         .post(`/api/rooms/${roomId}/messages`)
         .set('Authorization', `Bearer ${token}`)
         .send({content});

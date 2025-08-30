@@ -16,6 +16,14 @@ export class RoomService {
         return rooms.map(r => ({_id: r._id.toString(), name: r.name}));
     }
 
+    async getAllByUserId(userId: string) {
+        const roomUsers = await RoomUser.find({user: userId}).populate('room');
+        return roomUsers.map(ru => {
+            const room = ru.room as any;
+            return {_id: room._id.toString(), name: room.name};
+        });
+    }
+
     async get(id: string) {
         const room = await Room.findById(id);
         if (!room) throw new Error('not found');

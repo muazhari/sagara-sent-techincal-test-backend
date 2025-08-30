@@ -1,10 +1,7 @@
-import type {NextFunction, Request, Response} from 'express';
+import type {NextFunction, Response} from 'express';
 import jwt from 'jsonwebtoken';
-import {JWT_SECRET} from '../../config/env';
-
-export interface AuthenticatedRequest extends Request {
-    userId?: string;
-}
+import type {AuthenticatedRequest} from "../../infrastructure/server.ts";
+import {JWT_SECRET} from "../../infrastructure/env.ts";
 
 export function auth(required = true) {
     return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {

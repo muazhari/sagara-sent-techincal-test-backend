@@ -2,7 +2,7 @@ import {Service} from 'typedi';
 import {User} from '../models/user';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import {JWT_SECRET} from '../config/env';
+import {JWT_SECRET} from "../infrastructure/env.ts";
 
 @Service()
 export class AuthService {
