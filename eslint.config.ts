@@ -1,30 +1,28 @@
 import globals from "globals";
+import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
 
 export default [
     {
-        files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
         languageOptions: {
             globals: globals.node,
-            parser: tseslint.parser,
+        },
+    },
+    pluginJs.configs.recommended,
+    ...tseslint.configs.recommended,
+    {
+        files: ["**/*.ts"],
+        languageOptions: {
             parserOptions: {
-                ecmaVersion: 2022,
-                sourceType: "module",
                 project: "./tsconfig.json",
                 tsconfigRootDir: import.meta.dirname,
             },
         },
-        plugins: {
-            "@typescript-eslint": tseslint.plugin,
-        },
         rules: {
-            ...tseslint.configs.recommended.rules,
-        },
-    },
-    {
-        files: ["tests/**/*.ts"],
-        rules: {
-            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-explicit-any": "warn",
+            "@typescript-eslint/no-unsafe-function-type": "warn",
+            "no-empty": ["error", {allowEmptyCatch: true}],
+            "no-async-promise-executor": "off",
         },
     },
 ];

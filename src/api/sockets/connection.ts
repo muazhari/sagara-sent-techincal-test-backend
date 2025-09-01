@@ -1,4 +1,6 @@
-import {messageService, roomService, userService} from "../../infrastructure/container.ts";
+import messageService from "../../services/messageService.ts";
+import roomService from "../../services/roomService.ts";
+import userService from "../../services/userService.ts";
 import type {AuthenticatedSocket} from "../../infrastructure/server.ts";
 import {Server} from 'socket.io';
 

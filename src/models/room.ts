@@ -5,7 +5,7 @@ export interface IRoom extends Document {
     name: string;
 }
 
-const roomSchema = new Schema<IRoom>({
+export const roomSchema = new Schema<IRoom>({
     name: {type: String, required: true, unique: true},
 });
 

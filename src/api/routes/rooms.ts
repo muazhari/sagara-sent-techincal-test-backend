@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {auth} from '../middleware/auth';
-import {roomService} from "../../infrastructure/container.ts";
+import roomService from "../../services/roomService.ts";
 import type {AuthenticatedRequest} from "../../infrastructure/server.ts";
 
 const router = Router();

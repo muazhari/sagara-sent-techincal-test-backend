@@ -12,11 +12,13 @@ import jwt from "jsonwebtoken";
 import {connection} from "../api/sockets/connection.ts";
 import {JWT_SECRET} from "./env.ts";
 
+export const SERVER_INSTANCE = 'SERVER_INSTANCE';
+
 export interface ServerInstance {
+    port?: number;
     app: express.Express;
     httpServer: http.Server;
     io: Server;
-    close: () => Promise<void>;
 }
 
 export interface AuthenticatedRequest extends Request {
@@ -39,7 +41,6 @@ export async function buildServer(mongoUri: string): Promise<ServerInstance> {
     app.use('/api/rooms', messagesRouter);
     app.use('/api/users', usersRouter);
 
-
     const httpServer = http.createServer(app);
     const io = new Server(httpServer, {cors: {origin: '*'}});
 
@@ -58,10 +59,8 @@ export async function buildServer(mongoUri: string): Promise<ServerInstance> {
     io.on('connection', connection(io));
 
     return {
-        app, httpServer, io, close: async () => {
-            await io.close();
-            await new Promise((resolve, reject) => httpServer.close(resolve));
-            if (mongoose.connection.readyState !== 0) await mongoose.disconnect();
-        }
+        app,
+        httpServer,
+        io,
     };
 }

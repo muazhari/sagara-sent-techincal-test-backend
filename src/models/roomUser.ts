@@ -9,7 +9,7 @@ export interface IRoomUser extends Document {
     joinedAt: Date;
 }
 
-const roomUserSchema = new Schema<IRoomUser>({
+export const roomUserSchema = new Schema<IRoomUser>({
     room: {type: Schema.Types.ObjectId, ref: 'rooms', required: true},
     user: {type: Schema.Types.ObjectId, ref: 'users', required: true},
     joinedAt: {type: Date, default: Date.now}

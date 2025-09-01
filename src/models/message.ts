@@ -10,7 +10,7 @@ export interface IMessage extends Document {
     timestamp: Date;
 }
 
-const messageSchema = new Schema<IMessage>({
+export const messageSchema = new Schema<IMessage>({
     user: {type: Schema.Types.ObjectId, ref: 'users', required: true},
     room: {type: Schema.Types.ObjectId, ref: 'rooms', required: true},
     content: {type: String, required: true},

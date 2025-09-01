@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {auth} from '../middleware/auth';
-import {userService} from "../../infrastructure/container.ts";
+import userService from "../../services/userService.ts";
 import type {AuthenticatedRequest} from "../../infrastructure/server.ts";
 
 const router = Router();
